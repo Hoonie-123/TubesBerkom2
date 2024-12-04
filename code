@@ -1,0 +1,666 @@
+print("      -----------------------------------------------------")
+print("            Selamat Datang di Vending Machine Berkom!      ")
+print("      -----------------------------------------------------")
+print()
+print("Berikut adalah makanan/minuman yang tersedia!")
+ListBarang = ["Delfi Big Thunder 36gr", "Pocky Rasa Cokelat 47gr", "Beng Beng Reguler 25gr", "Sari Gandum Rasa Cokelat 108gr", "Sari Gandum Rasa Kacang 108gr", "Kitkat Wafer Cokelat 35gr", "Fruta Gummy 25gr", "Taro Net Seaweed 65gr", "Wallens Choco Soes 100gr", "Minute Maid Pulpy Orange 300ml", "Chupa Chups Sour Bites Jelly 56gr", "Kopi Kenangan Rasa Avocuddle 220ml", "Kopi Kenangan Rasa Mantancino 220ml", "Kopi Kenangan Rasa Black Aren 220ml", "Ichitan Thai Milk Tea 300ml", "Oishi Pillows Isi Cokelat 100gr", "Oishi Pillows Isi Ubi 100gr", "Oishi Sponge Crunch Rasa Cokelat 100gr", "Oishi Sponge Crunch Rasa Strawberry 100gr", "Pocari Sweat 350ml", "Ultra Milk Rasa Cokelat 200ml", "Ultra Milk Rasa Strawberry 200ml", "Ultra Milk Full Cream 200ml", "Delfi Top Rasa Cokelat 45gr", "Delfi Top Rasa Black in White 45gr", "Delfi Top Rasa Strawberry 45gr", "Cimory Yogurt Squeeze Original 120gr", "Silverqueen Milk Chocolate 58gr", "Silverqueen White Chocolate 58gr", "Silverqueen Green Tea Matcha 58gr", "Momogi Rasa Cokelat 12gr", "Momogi Rasa Jagung Bakar 12gr", "Cimory Fresh Milk Matcha 250ml", "Cimory Fresh Milk Sea Salt 250ml", "Cimory Fresh Milk Chocolate 250ml"]
+HargaBarang = [8500, 7000, 2500, 11000, 11000, 10000, 5500, 10000, 8500, 5500, 12500, 10000, 10000, 10000, 8500, 12000, 12000, 12500, 12500, 6500, 5500, 5500, 5500, 4000, 4000, 4000, 10500, 17500, 17500, 17500, 2500, 2500, 7000, 7000, 7000]
+JumlahBarang = [10 for i in range(len(ListBarang))]
+UangPecahan = [10 for i in range(100001)]
+Keranjang = ["" for i in range(len(ListBarang))]
+BanyakBarangKeranjang = 0
+JenisBarangKeranjang = 0
+TotalHarga = 0
+BanyakBarang = [0 for i in range(410)]
+IsKeranjang = 0
+
+#Fungsi Tabel Informasi Barang
+def TabelBarang():
+    print("|No|", end="")
+    for i in range(2):
+        for j in range(15): 
+            print(" ", end="")
+        if(i == 0):
+            print("Nama Barang", end="")
+        else:
+            print("|", end="")
+    print("  Harga Barang  | Stok Barang |")
+
+    for i in range(len(ListBarang)):
+        print(" ", end="")
+        print(i+1, end="  ")
+        if(i <= 8):
+            print(" ", end="")
+        print(ListBarang[i], end="")
+        for j in range(41-len(ListBarang[i])):
+            print(" ", end="")
+        print("  ", end="")
+        print(HargaBarang[i], end="")
+        for j in range(15-len(str(HargaBarang[i]))): #len("| Harga Barang ")
+            print(" ", end="")
+        print(" ", end="")
+        print(JumlahBarang[i])
+
+#Memeriksa ketersediaan barang
+def CekStok(NomorPembelian):
+    while(JumlahBarang[NomorPembelian-1] <= 0):
+        print("-------------------------------------------------------------------------------")
+        print("Stok yang Anda pilih telah habis.")
+        print("-------------------------------------------------------------------------------")
+        NomorPembelian = int(input("Masukkan angka sesuai produk yang Anda inginkan dan tekan enter: "))
+        NomorPembelian = CrossCheck(NomorPembelian)
+    return NomorPembelian
+
+#Memberikan informasi barang yang ingin dibeli
+def InformasiBarang(NomorPembelian):
+    print("-------------------------------------------------------------------------------")
+    print("Barang yang Anda pilih adalah: " + str(ListBarang[NomorPembelian-1]))
+    print("Harga barang yang Anda pilih adalah: Rp" + str(HargaBarang[NomorPembelian-1]))
+
+#Mengecek nomor yang di-input berada pada rentang 1-35 (sebanyak jumlah barang dalam vending machine)
+def CrossCheck(NomorPembelian):
+    while NomorPembelian > 35 or NomorPembelian < 1:
+        print("-------------------------------------------------------------------------------")
+        print("Produk tidak tersedia. Harap masukkan ulang.")
+        print("-------------------------------------------------------------------------------")
+        NomorPembelian = int(input("Masukkan angka sesuai produk yang Anda inginkan dan tekan enter: "))
+    return NomorPembelian
+
+#Fungsi jika user ingin mengganti produk (sebelumnya memilih tidak melanjutkan pembelian)
+def LanjutGa(Pilihan):
+    if Pilihan == "N":
+        print("-------------------------------------------------------------------------------")
+        NomorPembelian = int(input("Masukkan angka sesuai produk yang Anda inginkan dan tekan enter: "))
+        NomorPembelian = CrossCheck(NomorPembelian)
+        NomorPembelian = CekStok(NomorPembelian)
+        InformasiBarang(NomorPembelian)
+        print("-------------------------------------------------------------------------------")
+        Pilihan = input("Apakah Anda ingin melanjutkan pembelian barang ini? (Y/N): ")
+        return NomorPembelian, Pilihan
+    else:
+        print("-------------------------------------------------------------------------------")
+        print("Input Anda tidak sesuai. Silakan masukkan input sesuai instruksi.")
+
+#Update barang yang masuk ke keranjang
+def MasukKeranjang(NomorPembelian, TotalHarga, JenisBarangKeranjang):
+    TotalHarga = 0
+    print("-------------------------------------------------------------------------------")
+    BeliBerapa = int(input("Berapa banyak barang yang ingin Anda beli?: "))
+
+    #Jika barang yang dipilih lebih banyak dari stok
+    while BeliBerapa > JumlahBarang[NomorPembelian-1]:
+        print("-------------------------------------------------------------------------------")
+        print("Mohon maaf, barang tidak tersedia dalam jumlah tersebut")
+        print("-------------------------------------------------------------------------------")
+        BeliBerapa = int(input("Berapa banyak barang yang ingin Anda beli?: "))
+
+    TotalHarga += HargaBarang[NomorPembelian-1]*BeliBerapa
+    JumlahBarang[NomorPembelian-1] -= BeliBerapa
+    BanyakBarang[JenisBarangKeranjang] += BeliBerapa
+    Keranjang[JenisBarangKeranjang] = ListBarang[NomorPembelian-1]
+    return TotalHarga
+
+#Step 2: Menghitung besar kembalian yang akan didapatkan oleh user berdasarkan ketersediaan uang pecahan dalam vending machine
+def BesarKembalian(UangKembalianSistem, UangKembalianUser):
+    if(UangKembalianSistem >= 100000 and UangPecahan[100000] > 0):
+        UangKembalianUser += 100000*(UangKembalianSistem//100000)
+        UangPecahan[100000] -= (UangKembalianSistem//100000)
+        UangKembalianSistem -= 100000*(UangKembalianSistem//100000)
+    if(UangKembalianSistem >= 50000 and UangPecahan[50000] > 0):
+        UangKembalianUser += 50000*(UangKembalianSistem//50000)
+        UangPecahan[50000] -= (UangKembalianSistem//50000)
+        UangKembalianSistem -= 50000*(UangKembalianSistem//50000)
+    if(UangKembalianSistem >= 20000 and UangPecahan[20000] > 0):
+        UangKembalianUser += 20000*(UangKembalianSistem//20000)
+        UangPecahan[20000] -= (UangKembalianSistem//20000)
+        UangKembalianSistem -= 20000*(UangKembalianSistem//20000)
+    if(UangKembalianSistem >= 10000 and UangPecahan[10000] > 0):
+        UangKembalianUser += 10000*(UangKembalianSistem//10000)
+        UangPecahan[10000] -= (UangKembalianSistem//10000)
+        UangKembalianSistem -= 10000*(UangKembalianSistem//10000)
+    if(UangKembalianSistem >= 5000 and UangPecahan[5000] > 0):
+        UangKembalianUser += 5000*(UangKembalianSistem//5000)
+        UangPecahan[5000] -= (UangKembalianSistem//5000)
+        UangKembalianSistem -= 5000*(UangKembalianSistem//5000)
+    if(UangKembalianSistem >= 2000 and UangPecahan[2000] > 0):
+        UangKembalianUser += 2000*(UangKembalianSistem//2000)
+        UangPecahan[2000] -=(UangKembalianSistem//2000)
+        UangKembalianSistem -= 2000*(UangKembalianSistem//2000)
+    if(UangKembalianSistem >= 1000 and UangPecahan[1000] > 0):
+        UangKembalianUser += 1000*(UangKembalianSistem//1000)
+        UangPecahan[1000] -= (UangKembalianSistem//1000)
+        UangKembalianSistem -= 1000*(UangKembalianSistem//1000)
+    if(UangKembalianSistem >= 500 and UangPecahan[500] > 0):
+        UangKembalianUser += 500*(UangKembalianSistem//500)
+        UangPecahan[500] -= (UangKembalianSistem//500)
+        UangKembalianSistem -= 500*(UangKembalianSistem//500)
+    return UangKembalianUser, UangKembalianSistem
+
+#Step 3: Jika vending machine tidak dapat memberikan kembalian
+def TidakAdaKembalian(TotalHarga):
+    print("-------------------------------------------------------------------------------")
+    print("Mohon maaf, saat ini kami tidak memiliki kembalian yang cukup untuk Anda.")
+    print("Silakan ambil kembali uang Anda.") #Vending Machine mengeluarkan kembali uang pembeli
+    Uang = 0
+    print("-------------------------------------------------------------------------------")
+    print("Jika ingin melanjutkan transaksi, Anda dapat melakukan pembayaran melalui beberapa opsi berikut: ")
+    print("1.   Tunai dengan jumlah uang pas")
+    print("2.   QRIS")
+    print("3.   Debit")
+    print("4.   E-money")
+    print("-------------------------------------------------------------------------------")
+    Pilihan = input("Apakah ingin melanjutkan transaksi? (Y/N): ")
+
+    while(Pilihan != "N"):
+        if(Pilihan == "Y"):
+            print("-------------------------------------------------------------------------------")
+            OpsiPembayaran = input("Pilih Opsi Pembayaran Anda (1/2/3/4): ")
+
+            while(OpsiPembayaran != "1" and OpsiPembayaran != "2" and OpsiPembayaran != "3" and OpsiPembayaran != "4"):
+                print("-------------------------------------------------------------------------------")
+                print("Input Anda tidak sesuai. Silakan masukkan input sesuai instruksi.")
+                print("-------------------------------------------------------------------------------")
+                OpsiPembayaran = input("Pilih Opsi Pembayaran Anda (1/2/3): ")
+
+            #Pembayaran Tunai
+            if(OpsiPembayaran == "1"):
+                Tunai()
+
+            #Pembayaran QRIS
+            elif(OpsiPembayaran == "2"):
+                QRIS()
+
+            #Pembayaran Debit
+            elif OpsiPembayaran == "3":
+                Debit()
+            
+            #Pembayaran E-money
+            else:
+                E_money()
+            Pilihan = "N"
+        else:
+            print("-------------------------------------------------------------------------------")
+            print("Input Anda tidak sesuai. Silakan masukkan input sesuai instruksi.")
+            print("-------------------------------------------------------------------------------")
+            Pilihan = input("Apakah ingin melanjutkan transaksi? (Y/N): ")
+
+#Step 1 : Mencari besar kembalian
+def CariKembalian(TotalUang, HargaTotal):
+    UangKembalianSistem = TotalUang-HargaTotal
+    UangKembalianUser = 0
+
+    #Menyimpan besar UangKembalianUser awal
+    UangKembalianUser2 = UangKembalianUser
+
+    #Menghitung besar kembalian yang akan diterima oleh user
+    UangKembalianUser, UangKembalianSistem = BesarKembalian(UangKembalianSistem, UangKembalianUser)
+
+    #Jika vending machine tidak dapat memberikan kembalian
+    if(UangKembalianSistem != 0): 
+        TidakAdaKembalian(TotalHarga)
+
+    #Informasi kembalian yang diberikan oleh vending machine
+    if(UangKembalianSistem == 0): 
+        print("-------------------------------------------------------------------------------")
+        print("Kembalian Anda sebanyak Rp" + str(UangKembalianUser) + ".")
+        print("Silakan ambil barang Anda.") 
+        print("-------------------------------------------------------------------------------")
+        TotalUang = 0
+        HargaTotal = 0
+
+#Jika pembayaran menggunakan Tunai
+def Tunai(TotalHarga):
+    print("-------------------------------------------------------------------------------")
+    print("Mesin hanya menerima uang pecahan Rp500 dan seluruh pecahan uang kertas")
+    print("Harap masukkan pecahan yang sesuai dan masukkan pecahan uang satu per satu.")
+    
+    print("-------------------------------------------------------------------------------")
+    Uang = int(input("Masukkan uang anda (Jika pecahan berupa ribuan, masukkan tanpa titik): "))
+    while(Uang != 500 and Uang != 1000 and Uang != 2000 and Uang != 5000 and Uang != 10000 and Uang != 20000 and Uang != 50000 and Uang != 100000):
+        print("-------------------------------------------------------------------------------")
+        print("Mohon maaf, kami tidak dapat menerima pecahan uang Anda. Harap masukkan pecahan yang sesuai.")
+        print("-------------------------------------------------------------------------------")
+        Uang = int(input("Masukkan uang anda (Jika pecahan berupa ribuan, masukkan tanpa titik): "))
+    UangPecahan[Uang] += 1
+    TotalUang = Uang
+
+    #Proses user memasukkan uang ke dalam vending machine
+    while(TotalUang < TotalHarga):
+        print("-------------------------------------------------------------------------------")
+        Uang = int(input("Masukkan uang anda (Jika pecahan berupa ribuan, masukkan tanpa titik): "))
+        while(Uang != 500 and Uang != 1000 and Uang != 2000 and Uang != 5000 and Uang != 10000 and Uang != 20000 and Uang != 50000 and Uang != 100000):
+            print("-------------------------------------------------------------------------------")
+            print("Mohon maaf, kami tidak dapat menerima pecahan uang Anda. Harap masukkan pecahan yang sesuai.")
+            print("-------------------------------------------------------------------------------")
+            Uang = int(input("Masukkan uang anda (Jika pecahan berupa ribuan, masukkan tanpa titik): "))
+        TotalUang += Uang
+        UangPecahan[Uang] += 1
+    
+    #Memeriksa jumlah uang yang masuk dan total pembelian
+    if(TotalUang > TotalHarga):
+        CariKembalian(TotalUang, TotalHarga)
+    else:
+        print("-------------------------------------------------------------------------------")
+        print("Pembayaran berhasil.")
+        print("Silakan ambil barang Anda.")
+        print("-------------------------------------------------------------------------------")
+
+#Jika pembayaran menggunakan Debit
+def Debit():
+    print("-------------------------------------------------------------------------------")
+    print("Pilih jenis kartu kredit Anda!")
+    print("1.   Mandiri")
+    print("2.   BCA")
+    print("3.   BRI")
+    print("4.   BNI")
+    print("5.   BSI")
+    print("-------------------------------------------------------------------------------")
+    PilihanKartu = input("Masukkan pilihan Anda (1/2/3/4/5): ")
+    print("-------------------------------------------------------------------------------")
+    print("Silakan masukkan kartu Anda ke dalam mesin pembayaran.")
+    print("-------------------------------------------------------------------------------")
+    Kartu = input("Apakah Anda sudah memasukan kartu? (Y/N): ")
+    while Kartu != "Y":
+        if Kartu == "N":
+            print("-------------------------------------------------------------------------------")
+            print("Silakan masukkan kartu Anda ke dalam mesin pembayaran.")
+            print("-------------------------------------------------------------------------------")
+            Kartu = input("Apakah Anda sudah memasukan kartu? (Y/N): ")
+        else:
+            print("-------------------------------------------------------------------------------")
+            print("Input Anda tidak sesuai. Silakan masukkan input sesuai instruksi.")
+            print("-------------------------------------------------------------------------------")
+            Kartu = input("Apakah Anda sudah memasukan kartu? (Y/N): ")
+
+    print("-------------------------------------------------------------------------------")
+    PIN = input("Masukkan PIN Anda (6 digit): ")
+    while len(PIN) > 6 or len(PIN) < 6:
+        print("-------------------------------------------------------------------------------")
+        print("PIN Anda tidak sesuai. Silakan masukkan PIN sebanyak 6 digit")
+        print("-------------------------------------------------------------------------------")
+        PIN = input("Masukkan PIN Anda (6 digit): ")
+    print("-------------------------------------------------------------------------------")
+    print("Pembayaran berhasil!")
+    print("Silakan ambil barang Anda")
+
+#Jika pembayaran menggunakan E-money
+def E_money():
+    print("-------------------------------------------------------------------------------")
+    print("Silakan tempelkan kartu Anda.")
+    print("-------------------------------------------------------------------------------")
+    Kartu = input("Apakah Anda sudah menempelkan kartu? (Y/N): ")
+    while Kartu != "Y":
+        if Kartu == "N":
+            print("-------------------------------------------------------------------------------")
+            print("Silakan tempelkan kartu Anda ke dalam mesin pembayaran.")
+            print("-------------------------------------------------------------------------------")
+            Kartu = input("Apakah Anda sudah menempelkan kartu? (Y/N): ")
+        else:
+            print("-------------------------------------------------------------------------------")
+            print("Input Anda tidak sesuai. Silakan masukkan input sesuai instruksi.")
+            print("-------------------------------------------------------------------------------")
+            Kartu = input("Apakah Anda sudah menempelkan kartu? (Y/N): ")
+    print("-------------------------------------------------------------------------------")  
+    print("Pembayaran berhasil!")
+    print("Silakan ambil barang Anda")
+
+#Jika pembayaran menggunakan QRIS
+def QRIS():
+    print("-------------------------------------------------------------------------------")
+    print("Scan QR di bawah ini untuk melakukan pembayaran.")
+    print("# # # # # #")
+    print("* * # * # *")
+    print("# * # * # *")
+    print("* # * * # *")
+    print("* * * # * #")
+    print("-------------------------------------------------------------------------------")
+    Transaksi = input("Apakah Anda sudah menyelesaikan pembayaran? (Y/N): ")
+    while(Transaksi != "Y"):
+        if(Transaksi == "N"):
+            print("-------------------------------------------------------------------------------")
+            print("Scan QR di bawah ini untuk melakukan pembayaran.")
+            print("# # # # # #")
+            print("* * # * # *")
+            print("# * # * # *")
+            print("* # * * # *")
+            print("* * * # * #")
+            print("-------------------------------------------------------------------------------")
+            Transaksi = input("Apakah Anda sudah menyelesaikan pembayaran? (Y/N): ")
+        else:
+            print("-------------------------------------------------------------------------------")
+            print("Input Anda tidak sesuai. Silakan masukkan input sesuai instruksi.")
+            print("-------------------------------------------------------------------------------")
+            Transaksi = input("Apakah Anda sudah menyelesaikan pembayaran? (Y/N): ")
+    if(Transaksi == "Y"):
+        print("-------------------------------------------------------------------------------")
+        print("Pembayaran berhasil.")
+        print("Silakan ambil barang Anda.")
+
+TabelBarang()
+
+#Pengecekan nomor pembelian berdasarkan ketersediaan nomor dalam vending machine dan stok barang pada nomor tersebut
+print("-------------------------------------------------------------------------------")
+NomorPembelian = int(input("Masukkan angka sesuai produk yang Anda inginkan dan tekan enter: "))
+NomorPembelian = CrossCheck(NomorPembelian)
+NomorPembelian = CekStok(NomorPembelian)
+
+#Pemberian informasi mengenai barang yang akan dibeli
+InformasiBarang(NomorPembelian)
+
+#Memeriksa apakah user ingin melanjutkan pembelian barang
+print("-------------------------------------------------------------------------------")
+Pilihan = input("Apakah Anda ingin melanjutkan pembelian barang ini? (Y/N): ")
+
+#Jika tidak, akan masuk ke dalam program untuk mengganti nomor pembelian
+while(Pilihan != "Y"):
+    NomorPembelian, Pilihan = LanjutGa(Pilihan)
+
+#Menanyakan jumlah barang yang akan dibeli pada jenis barang tersebut
+print("-------------------------------------------------------------------------------")
+BeliBerapa = int(input("Berapa banyak barang yang ingin Anda beli?: "))
+while BeliBerapa > JumlahBarang[NomorPembelian-1]:
+    print("-------------------------------------------------------------------------------")
+    print("Mohon maaf, barang tidak tersedia dalam jumlah tersebut")
+    print("-------------------------------------------------------------------------------")
+    BeliBerapa = int(input("Berapa banyak barang yang ingin Anda beli?: "))
+
+#Menghitung total harga dari barang 1
+TotalHarga = HargaBarang[NomorPembelian-1]*BeliBerapa
+
+#Pilihan checkout
+print("-------------------------------------------------------------------------------")
+print("1.   Masukkan barang ke keranjang")
+print("2.   Melanjutkan ke opsi pembayaran")
+print("-------------------------------------------------------------------------------")
+Checkout = int(input("Pilih salah satu dari 2 opsi di atas (1/2): "))
+while(Checkout != 1 and Checkout != 2):
+    print("-------------------------------------------------------------------------------")
+    print("Input Anda tidak sesuai. Silakan masukkan input sesuai instruksi.")
+    print("-------------------------------------------------------------------------------")
+    Checkout = input("Pilih salah satu dari 2 opsi di atas (1/2): ")
+
+#User memilih memasukan barang ke keranjang
+if Checkout == 1:
+    IsKeranjang = 1
+    JumlahBarang[NomorPembelian-1] -= BeliBerapa
+    BanyakBarang[JenisBarangKeranjang] += BeliBerapa
+    Keranjang[JenisBarangKeranjang] = ListBarang[NomorPembelian-1]
+
+    #Menanyakan apakah ingin memilih barang lain
+    print("-------------------------------------------------------------------------------")
+    PilihLagi = input("Apakah Anda ingin memilih barang lain? (Y/N): ")
+
+    #Jika ya, akan kembali diproses untuk melakukan input nomor pembelian
+    while(PilihLagi != "N"):
+        if PilihLagi == "Y":
+
+            TabelBarang()
+
+            JenisBarangKeranjang += 1
+            
+            #Pengecekan nomor pembelian berdasarkan ketersediaan nomor dalam vending machine dan stok barang pada nomor tersebut
+            print("-------------------------------------------------------------------------------")
+            NomorPembelian = int(input("Masukkan angka sesuai produk yang Anda inginkan dan tekan enter: "))
+            NomorPembelian = CrossCheck(NomorPembelian)
+            NomorPembelian = CekStok(NomorPembelian)
+            
+            #Pemberian informasi mengenai barang yang akan dibeli
+            InformasiBarang(NomorPembelian)
+
+            #Memeriksa apakah user ingin melanjutkan pembelian barang
+            print("-------------------------------------------------------------------------------")
+            Pilihan = input("Apakah Anda ingin melanjutkan pembelian barang ini? (Y/N): ")
+
+            #Jika tidak, akan masuk ke dalam program untuk mengganti nomor pembelian
+            while(Pilihan != "Y"):
+                NomorPembelian, Pilihan = LanjutGa(Pilihan)
+
+            #Menghitung total harga setelah penambahan barang pembelian
+            HasilFungsi = MasukKeranjang(NomorPembelian, TotalHarga, JenisBarangKeranjang)
+            TotalHarga += HasilFungsi
+            
+            #Memeriksa apakah user ingin memilih barang lain
+            print("-------------------------------------------------------------------------------")
+            PilihLagi = input("Apakah Anda ingin memilih barang lain? (Y/N): ")
+        else:
+            print("-------------------------------------------------------------------------------")
+            print("Input Anda tidak sesuai. Silakan masukkan input sesuai instruksi.")
+            print("-------------------------------------------------------------------------------")
+            PilihLagi = input("Apakah Anda ingin memilih barang lain? (Y/N): ")
+
+#Memberikan output tabel barang yang akan dibeli
+if IsKeranjang == 1:
+    print("-------------------------------------------------------------------------------")
+    print("Barang yang anda pilih adalah: ")
+    print()
+    print(f"|No|               Nama Barang               | Jumlah Barang |")
+    NomorOutput = 0
+    for i in range(JenisBarangKeranjang+1):
+        print(" ", end="")
+        print(i+1, end="  ")
+        if(i <= 8):
+            print(" ", end="")
+        print(Keranjang[i], end="")
+        for j in range(41-len(Keranjang[i])):
+            print(" ", end="")
+        print(" ", end="")
+        print(BanyakBarang[i])
+        NomorOutput += 1
+    print("-------------------------------------------------------------------------------")
+    print(f"Total harga yang perlu dibayarkan adalah: Rp{TotalHarga}")  
+else:
+    print()
+    print("Barang yang anda pilih adalah: ")
+    print()
+    print(f"|No|               Nama Barang               | Jumlah Barang |")
+    NomorOutput = 0
+    print(" ", end="")
+    print("1", end="  ")
+    print(ListBarang[NomorPembelian-1], end="")
+    for j in range(41-len(ListBarang[NomorPembelian-1])):
+        print(" ", end="")
+    print(" ", end="")
+    print(BeliBerapa)
+    NomorOutput += 1
+    print("-------------------------------------------------------------------------------")
+    print(f"Total harga yang perlu dibayarkan adalah: Rp{TotalHarga}")  
+
+#Proses pembayaran
+print("-------------------------------------------------------------------------------")
+print("Vending machine kami menerima pembayaran melalui:")
+print("1.   Tunai")
+print("2.   QRIS")
+print("3.   Debit")
+print("4.   E-money")
+print("-------------------------------------------------------------------------------")
+OpsiPembayaran = input("Pilih Opsi Pembayaran Anda (1/2/3/4): ")
+
+while(OpsiPembayaran != "1" and OpsiPembayaran != "2" and OpsiPembayaran != "3" and OpsiPembayaran != "4"):
+    print("-------------------------------------------------------------------------------")
+    print("Input Anda tidak sesuai. Silakan masukkan input sesuai instruksi.")
+    print("-------------------------------------------------------------------------------")
+    OpsiPembayaran = input("Pilih Opsi Pembayaran Anda (1/2/3/4): ")
+    
+if OpsiPembayaran == "1":
+    Tunai(TotalHarga)
+elif OpsiPembayaran == "2":
+    QRIS()
+elif OpsiPembayaran == "3":
+    Debit()
+else:
+    E_money()
+
+#Cek Apakah User Ingin Beli Lagi
+print("-------------------------------------------------------------------------------")
+BeliLagi = input("Apakah Anda ingin melakukan pembelian lagi? (Y/N): ")
+while(BeliLagi != "N"):
+    if(BeliLagi == "Y"):
+        #Reset nilai variabel
+        Keranjang = ["" for i in range(len(ListBarang))]
+        BanyakBarangKeranjang = 0
+        JenisBarangKeranjang = 0
+        TotalHarga = 0
+        BanyakBarang = [0 for i in range(410)]
+        IsKeranjang = 0
+
+        TabelBarang()
+
+        #Pengecekan nomor pembelian berdasarkan ketersediaan nomor dalam vending machine dan stok barang pada nomor tersebut
+        print("-------------------------------------------------------------------------------")
+        NomorPembelian = int(input("Masukkan angka sesuai produk yang Anda inginkan dan tekan enter: "))
+        NomorPembelian = CrossCheck(NomorPembelian)
+        NomorPembelian = CekStok(NomorPembelian)
+
+        #Pemberian informasi mengenai barang yang akan dibeli
+        InformasiBarang(NomorPembelian)
+
+        #Memeriksa apakah user ingin melanjutkan pembelian barang
+        print("-------------------------------------------------------------------------------")
+        Pilihan = input("Apakah Anda ingin melanjutkan pembelian barang ini? (Y/N): ")
+
+        #Jika tidak, akan masuk ke dalam program untuk mengganti nomor pembelian
+        while(Pilihan != "Y"):
+            NomorPembelian, Pilihan = LanjutGa(Pilihan)
+
+        #Menanyakan jumlah barang yang akan dibeli pada jenis barang tersebut
+        print("-------------------------------------------------------------------------------")
+        BeliBerapa = int(input("Berapa banyak barang yang ingin Anda beli?: "))
+        while BeliBerapa > JumlahBarang[NomorPembelian-1]:
+            print("-------------------------------------------------------------------------------")
+            print("Mohon maaf, barang tidak tersedia dalam jumlah tersebut")
+            print("-------------------------------------------------------------------------------")
+            BeliBerapa = int(input("Berapa banyak barang yang ingin Anda beli?: "))
+
+        #Menghitung total harga barang 1
+        TotalHarga = HargaBarang[NomorPembelian-1]*BeliBerapa
+
+        #Mengurangi jumlah barang pada stok
+        JumlahBarang[NomorPembelian-1] -= BeliBerapa
+
+        #Pilihan checkout
+        print("-------------------------------------------------------------------------------")
+        print("1.   Masukkan barang ke keranjang")
+        print("2.   Melanjutkan ke opsi pembayaran")
+        print("-------------------------------------------------------------------------------")
+        Checkout = int(input("Pilih salah satu dari 2 opsi di atas (1/2): "))
+        while(Checkout != 1 and Checkout != 2):
+            print("-------------------------------------------------------------------------------")
+            print("Input Anda tidak sesuai. Silakan masukkan input sesuai instruksi.")
+            print("-------------------------------------------------------------------------------")
+            Checkout = input("Pilih salah satu dari 2 opsi di atas (1/2): ")
+
+        #User memilih memasukan barang ke keranjang
+        if Checkout == 1:
+            IsKeranjang = 1
+            JumlahBarang[NomorPembelian-1] -= BeliBerapa
+            BanyakBarang[JenisBarangKeranjang] += BeliBerapa
+            Keranjang[JenisBarangKeranjang] = ListBarang[NomorPembelian-1]
+
+            print("-------------------------------------------------------------------------------")
+            PilihLagi = input("Apakah Anda ingin memilih barang lain? (Y/N): ")
+
+            while(PilihLagi != "N"):
+                if PilihLagi == "Y":
+
+                    TabelBarang()
+
+                    JenisBarangKeranjang += 1
+                    
+                    print("-------------------------------------------------------------------------------")
+                    NomorPembelian = int(input("Masukkan angka sesuai produk yang Anda inginkan dan tekan enter: "))
+                    NomorPembelian = CrossCheck(NomorPembelian)
+                    NomorPembelian = CekStok(NomorPembelian)
+                    
+                    InformasiBarang(NomorPembelian)
+
+                    print("-------------------------------------------------------------------------------")
+                    Pilihan = input("Apakah Anda ingin melanjutkan pembelian barang ini? (Y/N): ")
+
+                    while(Pilihan != "Y"):
+                        NomorPembelian, Pilihan = LanjutGa(Pilihan)
+
+                    HasilFungsi = MasukKeranjang(NomorPembelian, TotalHarga, JenisBarangKeranjang)
+                    TotalHarga += HasilFungsi
+                    
+                    print("-------------------------------------------------------------------------------")
+                    PilihLagi = input("Apakah Anda ingin memilih barang lain? (Y/N): ")
+                else:
+                    print("-------------------------------------------------------------------------------")
+                    print("Input Anda tidak sesuai. Silakan masukkan input sesuai instruksi.")
+                    print("-------------------------------------------------------------------------------")
+                    PilihLagi = input("Apakah Anda ingin memilih barang lain? (Y/N): ")
+
+        #Memberikan output tabel barang yang akan dibeli
+        if IsKeranjang == 1:
+            print("-------------------------------------------------------------------------------")
+            print("Barang yang anda pilih adalah: ")
+            print()
+            print(f"|No|               Nama Barang               | Jumlah Barang |")
+            NomorOutput = 0
+            for i in range(JenisBarangKeranjang+1):
+                print(" ", end="")
+                print(i+1, end="  ")
+                if(i <= 8):
+                    print(" ", end="")
+                print(Keranjang[i], end="")
+                for j in range(41-len(Keranjang[i])):
+                    print(" ", end="")
+                print(" ", end="")
+                print(BanyakBarang[i])
+                NomorOutput += 1
+            print("-------------------------------------------------------------------------------")
+            print(f"Total harga yang perlu dibayarkan adalah: Rp{TotalHarga}")  
+        else:
+            print("-------------------------------------------------------------------------------")
+            print("Barang yang anda pilih adalah: ")
+            print()
+            print(f"|No|               Nama Barang               | Jumlah Barang |")
+            NomorOutput = 0
+            print(" ", end="")
+            print("1", end="  ")
+            print(ListBarang[NomorPembelian-1], end="")
+            for j in range(41-len(ListBarang[NomorPembelian-1])):
+                print(" ", end="")
+            print(" ", end="")
+            print(BeliBerapa)
+            NomorOutput += 1
+            print("-------------------------------------------------------------------------------")
+            print(f"Total harga yang perlu dibayarkan adalah: Rp{TotalHarga}")  
+
+        #Proses pembayaran
+        print("-------------------------------------------------------------------------------")
+        print("Vending machine kami menerima pembayaran melalui:")
+        print("1.   Tunai")
+        print("2.   QRIS")
+        print("3.   Debit")
+        print("4.   E-money")
+        print("-------------------------------------------------------------------------------")
+        OpsiPembayaran = input("Pilih Opsi Pembayaran Anda (1/2/3/4): ")
+
+        while(OpsiPembayaran != "1" and OpsiPembayaran != "2" and OpsiPembayaran != "3" and OpsiPembayaran != "4"):
+            print("-------------------------------------------------------------------------------")
+            print("Input Anda tidak sesuai. Silakan masukkan input sesuai instruksi.")
+            print("-------------------------------------------------------------------------------")
+            OpsiPembayaran = input("Pilih Opsi Pembayaran Anda (1/2/3/4): ")
+            
+        if OpsiPembayaran == "1":
+            Tunai(TotalHarga)
+        elif OpsiPembayaran == "2":
+            QRIS()
+        elif OpsiPembayaran == "3":
+            Debit()
+        else:
+            E_money() 
+        
+        #Cek Apakah User Ingin Beli Lagi
+        print("-------------------------------------------------------------------------------")
+        BeliLagi = input("Apakah Anda ingin melakukan pembelian lagi? (Y/N): ")
+    else:
+        print("-------------------------------------------------------------------------------")
+        print("Input Anda tidak sesuai. Silakan masukkan input sesuai instruksi.")
+        print("-------------------------------------------------------------------------------")
+        BeliLagi = input("Apakah Anda ingin melakukan pembelian lagi? (Y/N): ")
+
+print("-------------------------------------------------------------------------------")
+print("          Terima Kasih Telah Berbelanja di Vending Machine Berkom!             ")
+print("-------------------------------------------------------------------------------")
